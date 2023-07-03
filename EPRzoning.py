@@ -30,29 +30,58 @@ Zone70Prop =   [0]*len(ZoneNames)
 Zone200Area =  [0]*len(ZoneNames)
 Zone70Area =   [0]*len(ZoneNames)
 
-# Open the planning map image, define where the map is within the image, crop it, and save the crop for inspection
+def exit_message(msg=""):
+    if msg:
+        print(msg)
+    input("Press Enter to close")
+    exit()
+
+# Open the planning map image
 script_location = Path(__file__).absolute().parent
 file_location = script_location / 'image.png'
-im = Image.open(file_location)
-# box = (1005, 479, 6891,4265)
-# im = im.crop(box)
-# im.show()
-# im.save(script_location / "crop.png")
+try:
+    im = Image.open(file_location)
+except:
+    exit_message("Error: image.png not found")
+
+# check if printed or exported
+if im.width == 7016 and im.height == 4962:
+    # printed as high res A2 png @ 1:2257
+    print("Processing printed image")
+    box = (1005, 479, 6891, 4265)
+    im = im.crop(box) # crop to the map
+    im.show()
+    im.save(script_location / "crop.png")
+    scale = 4.725 # pixels per m
+else:
+    print("Processing exported image")
+    map_scales = [2257, 4514, 9028, 18056]
+    print("Choose map scale: ")
+    for i in range(len(map_scales)):
+        print(f"{i+1}. 1:{map_scales[i]}")
+    selected = input("Input scale [1-4] and press Enter: ")
+    if not selected:
+        selected = 1 # default to 1:2257
+    map_scale = map_scales[int(selected)-1]
+    print(f"Selected scale 1:{map_scale}")
+
+    # calculate the pixel scale
+    scale = 2.114*(2257.0/map_scale) # pixels per m
 
 # Initialise EPR spreadsheet
 sheet_name = 'EPR 2021 Mech Noise Limit, Assessment & Report tool (r5).xlsx'
 
-# Define the centre of the circle (here by default is the centre of the image, but with the option to change this below).
-pixelX = int(im.width/2)
-pixelY = int(im.height/2)
+# Define the centre of the circle
+pixelX = round(im.width/2)
+pixelY = round(im.height/2)
 
-# scale is 1:2257 on vicplan
-scale = 2.114 # pixels per m - why vicplan why???? so close to 2.257 but no...
-
-radius200 = int(200*scale)
-radius70 = int(70*scale)
+radius200 = round(200*scale)
+radius70 = round(70*scale)
 total200Pix = math.pi * radius200**2
 total70Pix = math.pi * radius70**2
+
+if (im.height < (radius200*2)):
+    exit_message("Error: Exported image is too small")
 
 # Define the area of the two circles in m2 (for error checking)
 area200 = math.pi * 200**2
@@ -192,4 +221,4 @@ f.write("\n")
 f.close()
 
 # wait for input from the user before closing the command prompt, in case they want to read anything
-input()
+exit_message()
