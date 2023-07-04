@@ -5,6 +5,7 @@ import math as math
 from tqdm import tqdm
 from pathlib import Path
 import openpyxl
+import os
 
 """
 Streamlining ideas
@@ -37,8 +38,9 @@ def exit_message(msg=""):
     exit()
 
 # Open the planning map image
-script_location = Path(__file__).absolute().parent
+script_location = Path(os.getcwd())
 file_location = script_location / 'image.png'
+print(file_location)
 try:
     im = Image.open(file_location)
 except:
