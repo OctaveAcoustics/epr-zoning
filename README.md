@@ -24,3 +24,9 @@ Follow the steps for the chosen method. (Note: Print was removed May 2023 but is
 4. Print as high resolution A2 PNG, save as "image.png", and place in the same folder as the executable/script.
 5. Run EPRzoning.py.
 6. Check spreadsheet and fill in any missing zone types.
+
+## Compiling (for developers)
+Create the single file executable:
+```
+pyinstaller --onefile EPRzoning.py
+```
