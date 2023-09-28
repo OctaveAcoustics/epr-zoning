@@ -15,13 +15,14 @@ if the tool doesn't find anything (the image in the folder or zones)- don't clos
 """
 
 # Define zone names and colours (RGB). Note that zone colours and names have to be defined at the same indice
-ZoneNames =["RDZ1" , "NRZ", "ACZ1", "RDZ2", "PUZ4", "PUZ", "GRZ", "RCZ3", "PPRZ", "IN3Z", "IN1Z","MUZ","RGZ","C1Z","C2Z","UFZ","B2Z", "PCRZ", "SUZ","UGZ2","CCZ", "LDRZ", "GWZ2","CDZ3","CA","TRZ1","TRZ2","TRZ3","TRZ4", "The Sea (no zone)","FZ"]
+ZoneNames =["RDZ1" , "NRZ", "ACZ1", "RDZ2", "PUZ4", "PUZ", "GRZ", "RCZ3", "PPRZ", "IN3Z", "IN1Z","MUZ","RGZ","C1Z","C2Z","UFZ","B2Z", 
+            "PCRZ", "SUZ","UGZ2","CCZ", "LDRZ", "GWZ2","CDZ3","CA","TRZ1","TRZ2","TRZ3","TRZ4", "The Sea (no zone)","FZ","RLZ","IN2Z"]
 ZoneColours = [(240,0,176),(255, 209, 204),(153, 204, 204),(255, 176, 0), (227, 227, 227), ( #"RDZ1" , "NRZ1", "ACZ1", "RDZ2", "PUZ4"
     255, 255, 153),(255, 181, 207),(204, 204, 0),(161, 219, 178), (191,89,26), (240,176,130),( #"PUZ", "GRZ", "RCZ3", "PPRZ", "IN3Z", "IN1Z"
     217,  77,  77),(255, 153,204),(240,217, 250), (194,140,178), (153,227,255), (224,181,242), ( #"MUZ","RGZ","C1Z","C2Z","UFZ","B2Z"
     97, 204, 38), (222, 250, 138),(238, 180, 180),(25, 255, 235),(255, 166, 153),(204, 204, 153),( #"PCRZ", "SUZ5?","UGZ2","CCZ", "LDRZ", "GWZ2"
     0,189,194),(255,255,255),(200,205,215),(110,120,145),(140,150,185),(215,225,235),(230,246,255),(# "CDZ3","CA","TRZ1 (formerly PUZ4)","TRZ2 (formerly RDZ1)","TRZ3 (formerly RDZ2)","TRZ4 (formerly PUZ4)", "The Sea (no zone) (literally the sea)
-    222,255,237)] # FZ
+    222,255,237), (255, 204, 153), (204, 166, 128)] # FZ, RLZ, IN2Z
 
 # Fill arrays used with zeroes
 Zone200Count = [0]*len(ZoneNames)
@@ -101,7 +102,8 @@ for j in tqdm(range(pixelY-radius200,pixelY+radius200)):
         currentPix = im.getpixel((i,j))[0:3]
 
         # Check if the pixel is within the 200m circle
-        if ((math.fabs(i-pixelX))**2 + (math.fabs(j-pixelY))**2) < radius200**2:
+        pixel_distance = math.sqrt((math.fabs(i-pixelX))**2 + (math.fabs(j-pixelY))**2)
+        if pixel_distance < radius200:
             for zone in range(0,len(ZoneNames)):
 
                 # If the pixel is within the circle, check if the colour matches anything in the ZoneColours array. If it does, add a count to its respective indice.
@@ -112,7 +114,7 @@ for j in tqdm(range(pixelY-radius200,pixelY+radius200)):
                     total200CountedPix+=1
 
         # Do the same but for the 70m circle (yes I know we're double dipping on the pixels for 70m and 70m within the 200m and it would be easy to do both at the same time, but leave me alone)
-        if ((math.fabs(i-pixelX))**2 + (math.fabs(j-pixelY))**2) < radius70**2:
+        if pixel_distance < radius70:
             for zone in range(0,len(ZoneNames)):
                 if(currentPix == (ZoneColours[zone])):
                     Zone70Count[zone]+=1
